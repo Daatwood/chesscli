@@ -13,7 +13,6 @@ module Chess
       def from_string(file_rank_string)
         validate_class file_rank_string, String
         validate_presence_of file_rank_string
-
         return nil unless valid_position?(file_rank_string)
         file, rank = split file_rank_string
         new(file.to_sym, rank.to_i)
@@ -22,7 +21,6 @@ module Chess
       # Creates an instance from index positions of file and rank.
       def from_indexes(file_index, rank_index)
         return nil unless valid_indexes?(file_index, rank_index)
-
         new(files[file_index], ranks[rank_index])
       end
 
@@ -36,9 +34,7 @@ module Chess
       # Determines if file and rank indexes are valid
       def valid_indexes?(file_index, rank_index)
         validate_class file_index, Integer
-
         validate_class rank_index, Integer
-
         (file_index > -1 && file_index < files.size) &&
           (rank_index > -1 && rank_index < ranks.size)
       end
@@ -76,15 +72,19 @@ module Chess
     end
 
     def file_index
-      @file_index ||= self.class.files.index(@file)
+      @file_index = self.class.files.index(@file)
     end
 
     def rank_index
-      @rank_index ||= self.class.ranks.index(@rank)
+      @rank_index = self.class.ranks.index(@rank)
     end
 
     def to_s
       "#{@file}#{@rank}"
+    end
+
+    def ==(other)
+      to_s.eql? other.to_s unless other.nil?
     end
   end
 end

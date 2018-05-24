@@ -20,9 +20,7 @@ module Chess
 
       def from_string(piece_string)
         validate_class piece_string, String
-
         validate_included piece_string.downcase, types
-
         Object.const_get("Chess::#{piece_string.capitalize}").new
       end
     end

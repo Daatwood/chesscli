@@ -2,73 +2,75 @@
 
 require 'spec_helper'
 
-module Chess
-  describe Piece do
-    subject { Piece }
+RSpec.describe Chess::Piece do
+  describe '.descendants' do
+    subject(:descendants) { described_class.descendants }
 
-    context '.descendants' do
-      it 'returns an array' do
-        expect(subject.descendants).to be_an Array
-      end
-
-      it 'contains only subclasses' do
-        expect(subject.descendants).to all be < subject
-      end
-
-      it 'returns the same object each call' do
-        expect(subject.descendants).to equal(subject.descendants)
-      end
-    end
-    context '.types' do
-      it 'returns an array' do
-        expect(subject.types).to be_an Array
-      end
-
-      it 'contains only strings' do
-        expect(subject.types).to all be_a String
-      end
-
-      it 'returns the same object each call' do
-        expect(subject.types).to equal(subject.types)
-      end
+    it 'returns an array' do
+      is_expected.to be_an Array
     end
 
-    context '.from_string' do
-      describe 'expects an argument' do
-        it 'be a string' do
-          expect { subject.from_string(123) }.to validate_class_as String
-        end
+    it 'contains only subclasses' do
+      is_expected.to all be < described_class
+    end
 
-        it 'value of a valid type' do
-          expect { subject.from_string('123') }
-            .to validate_included_in subject.types
-        end
+    it 'returns the same object each call' do
+      is_expected.to equal(described_class.descendants)
+    end
+  end
+
+  describe '.types' do
+    subject(:types) { described_class.types }
+
+    it 'returns an array' do
+      is_expected.to be_an Array
+    end
+
+    it 'contains only strings' do
+      is_expected.to all be_a String
+    end
+
+    it 'returns the same object each call' do
+      is_expected.to equal(described_class.types)
+    end
+  end
+
+  describe '.from_string' do
+    context 'with incorrect argument' do
+      it 'be a string' do
+        expect { described_class.from_string(123) }.to ensure_class_as String
       end
 
-      describe 'correct agruments' do
-        let(:type) { subject.types.sample }
-
-        it 'a type of piece' do
-          expect(subject.from_string(type)).to be_kind_of Piece
-        end
-        it 'class name matches string' do
-          expect(subject.from_string(type).class.name).to match(/#{type}/i)
-        end
+      it 'value of a valid type' do
+        expect { described_class.from_string('kong') }.to ensure_included
       end
     end
 
-    context '.available_moves' do
-      subject { Piece.new }
+    context 'with correct argument' do
+      subject(:from_string) { described_class.from_string(type) }
 
-      it 'expects a string' do
-        expect { subject.available_moves(123) }.to validate_class_as String
-      end
+      let(:type) { described_class.types.sample }
 
-      it 'ordered by number then letter' do
-        allow(Movement).to receive(:project).and_return(%w[f9 f1 a4 a1 d3])
-        expect(subject.available_moves('a1'))
-          .to contain_exactly('a1', 'f1', 'd3', 'a4', 'f9')
+      it 'a type of piece' do
+        expect(from_string).to be_kind_of described_class
       end
+      it 'class name matches string' do
+        expect(from_string.class.name).to match(/#{type}/i)
+      end
+    end
+  end
+
+  describe '.available_moves' do
+    subject(:new) { described_class.new }
+
+    it 'expects a string' do
+      expect { new.available_moves(123) }.to ensure_class_as String
+    end
+
+    it 'ordered by number then letter' do
+      allow(Chess::Movement).to receive(:project).and_return(%w[f9 f1 a4 a1 d3])
+      expect(new.available_moves('a1'))
+        .to contain_exactly('a1', 'f1', 'd3', 'a4', 'f9')
     end
   end
 end

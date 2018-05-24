@@ -4,37 +4,50 @@ RSpec::Matchers.define :have_constant do |const|
   match do |actual|
     actual.const_defined?(const)
   end
+
+  description do
+    'have constant defined'
+  end
 end
 
-RSpec::Matchers.define :be_assigning do |attribute|
+RSpec::Matchers.define :reassign do |attribute|
   match do |actual|
     actual.respond_to?("#{attribute}=")
   end
 
-  match_when_negated do |actual|
-    !actual.respond_to?("#{attribute}=")
+  description do
+    "be able to reassign #{attribute}"
   end
 end
 
-RSpec::Matchers.define :validate_class_as do |klass|
+RSpec::Matchers.define :ensure_class_as do |klass|
   match do
-    raise_error(Chess::ArgumentType, /be a #{klass}/)
+    raise_error(Chess::ArgumentClass, /be a #{klass}/)
   end
-
-  supports_block_expectations
-end
-
-RSpec::Matchers.define :validate_presense do
-  match do
-    raise_error(Chess::ArgumentType, /not be blank/)
+  description do
+    "raise error when not #{klass}"
   end
 
   supports_block_expectations
 end
 
-RSpec::Matchers.define :validate_included_in do |array|
+RSpec::Matchers.define :ensure_presence do
   match do
-    raise_error(Chess::UnknownType, /not included in #{array.join(', ')}/)
+    raise_error(Chess::EmptyArgument, /not be blank/)
+  end
+  description do
+    'raise error when blank'
+  end
+
+  supports_block_expectations
+end
+
+RSpec::Matchers.define :ensure_included do
+  match do
+    raise_error(Chess::UnknownType, /not included in/)
+  end
+  description do
+    'raise error when wrong type'
   end
 
   supports_block_expectations

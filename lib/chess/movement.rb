@@ -18,8 +18,11 @@ module Chess
 
       def move_as_ray(file_rank, file_offset, rank_offset)
         set = []
+        last_file_rank = nil
         while (file_rank = move_as_offset(file_rank, file_offset, rank_offset))
+          break if last_file_rank == file_rank # Break out, not going anywhere..
           set << file_rank
+          last_file_rank = file_rank.dup
         end
         set
       end
@@ -28,12 +31,9 @@ module Chess
       # Value of a key is an array containing an array of file and rank offsets
       def project(file_rank, movement_set)
         validate_class movement_set, Hash
-
         validate_class file_rank, FileRank
-
         movement_set.each_with_object([]) do |(move_type, offsets), positions|
           validate_included move_type.downcase, types
-
           move_func = move_type.to_s.prepend('move_as_')
           offsets.each do |offset|
             positions << public_send(move_func, file_rank, *offset)

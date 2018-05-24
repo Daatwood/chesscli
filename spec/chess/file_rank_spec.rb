@@ -2,222 +2,241 @@
 
 require 'spec_helper'
 
-module Chess
-  describe FileRank do
-    subject { FileRank }
+RSpec.describe Chess::FileRank do
+  subject(:instance) { described_class.from_string(valid_format) }
 
-    let(:valid_format)   { 'a1'                                     }
-    let(:invalid_format) { valid_format.reverse                     }
-    let(:instance)       { subject.from_string(valid_format.upcase) }
+  let(:valid_format) { 'a1' }
 
-    it 'privatizes new' do
-      expect { subject.public_send(:new) }
+  let(:files_size)   { described_class.files.size }
+  let(:ranks_size)   { described_class.ranks.size }
+
+  describe 'FILE_RANGE' do
+    it { expect(described_class).to have_constant :FILE_RANGE }
+  end
+
+  describe 'RANK_RANGE' do
+    it { expect(described_class).to have_constant :RANK_RANGE }
+  end
+
+  describe '.new' do
+    it 'is private' do
+      expect { described_class.public_send(:new) }
         .to raise_error(NoMethodError, /private/)
     end
+  end
 
-    describe 'RANK_RANGE' do
-      it 'is defined' do
-        is_expected.to have_constant(:RANK_RANGE)
+  describe '.files' do
+    subject(:files) { described_class.files }
+
+    it 'same object each call' do
+      is_expected.to equal(described_class.files)
+    end
+
+    it 'contains only symbols' do
+      is_expected.to all be_kind_of Symbol
+    end
+  end
+
+  describe '.ranks' do
+    subject(:ranks) { described_class.ranks }
+
+    it 'same object each call' do
+      is_expected.to equal(described_class.ranks)
+    end
+
+    it 'contains only integers' do
+      is_expected.to all be_kind_of Integer
+    end
+  end
+
+  describe '.from_string' do
+    subject(:from_string) { described_class.method(:from_string) }
+
+    context 'with wrong argument type' do
+      it { expect { from_string[55] }.to ensure_class_as String }
+
+      it { expect { from_string[''] }.to ensure_presence }
+    end
+
+    context 'with correct argument type' do
+      it 'calls valid position' do
+        expect(described_class).to receive(:valid_position?)
+        from_string[valid_format]
+      end
+
+      it 'invalid position returns nil' do
+        expect(from_string['9a']).to be_nil
+      end
+
+      it 'returns an instance' do
+        expect(from_string[valid_format]).to be_kind_of described_class
+      end
+
+      it 'performs new call' do
+        expect(described_class).to receive(:new)
+        from_string[valid_format]
+      end
+
+      it 'sets file to lowercase' do
+        expect(from_string[valid_format].file).to match(/[a-z]/)
+      end
+    end
+  end
+
+  describe '.from_indexes' do
+    subject(:from_indexes) { described_class.method(:from_indexes) }
+
+    context 'with wrong argument types' do
+      it { expect { from_indexes['0', '0'] }.to ensure_class_as Integer }
+    end
+
+    context 'with correct argument types' do
+      it 'calls valid indexes' do
+        expect(described_class).to receive(:valid_indexes?)
+        from_indexes[0, 0]
+      end
+
+      it 'out of bounds is returns nil' do
+        expect(from_indexes[files_size, ranks_size]).to be_nil
+      end
+
+      it 'returns an instance' do
+        expect(from_indexes[0, 0]).to be_kind_of described_class
+      end
+
+      it 'performs new call' do
+        expect(described_class).to receive(:new)
+        from_indexes[0, 0]
+      end
+    end
+  end
+
+  describe '.valid_position?' do
+    subject(:position) { described_class.method(:valid_position?) }
+
+    context 'with wrong argument types' do
+      it 'with empty string' do
+        expect(position['']).to be false
+      end
+
+      it 'with a number' do
+        expect(position[11]).to be false
       end
     end
 
-    describe 'FILE_RANGE' do
-      it 'is defined' do
-        is_expected.to have_constant(:FILE_RANGE)
+    context 'when invalid' do
+      it 'out of bounds file' do
+        expect(position['z1']).to be false
+      end
+      it 'out of bounds rank' do
+        expect(position["a#{ranks_size + 1}"]).to be false
+      end
+      it 'zero rank' do
+        expect(position['a0']).to be false
+      end
+      it 'with decimal' do
+        expect(position['d1.2']).to be false
+      end
+      it 'is a number' do
+        expect(position[99]).to be false
+      end
+
+      it 'wrong format' do
+        expect(position['1a']).to be false
       end
     end
 
-    describe '.files' do
-      it 'same object each call' do
-        expect(subject.files).to equal(subject.files)
+    context 'when valid' do
+      it 'lowest position' do
+        expect(position['a1']).to be true
       end
 
-      it 'contains only symbols' do
-        expect(subject.files).to all be_kind_of Symbol
+      it 'highest position' do
+        expect(position["H#{ranks_size}"]).to be true
+      end
+
+      it 'in all caps' do
+        expect(position['A1']).to be true
+      end
+    end
+  end
+
+  describe '.valid_indexes?' do
+    subject(:indexes) { described_class.method(:valid_indexes?) }
+
+    context 'with wrong argument types' do
+      it 'with decimal indexes' do
+        expect { indexes[3.4, 0] }.to ensure_class_as Integer
+      end
+
+      it 'with strings' do
+        expect { indexes['0', '1'] }.to ensure_class_as Integer
       end
     end
 
-    describe '.ranks' do
-      it 'same object each call' do
-        expect(subject.ranks).to equal(subject.ranks)
+    context 'when invalid' do
+      it 'out of bounds file index' do
+        expect(indexes[files_size, 0]).to be false
       end
-
-      it 'contains only integers' do
-        expect(subject.ranks).to all be_kind_of Integer
+      it 'out of bounds rank index' do
+        expect(indexes[0, ranks_size]).to be false
       end
-    end
-
-    describe '.from_string' do
-      let(:oob_position) { "a#{subject.ranks.size + 1}" }
-
-      context 'with wrong argument' do
-        it 'not a string raises argument type' do
-          expect { subject.from_string(55) }.to validate_class_as String
-        end
-
-        it 'empty string raises argument type' do
-          expect { subject.from_string('') }.to validate_presense
-        end
-
-        it 'a wrong format returns nil' do
-          expect(subject.from_string(invalid_format)).to be_nil
-        end
-
-        it 'out of bounds raises nil' do
-          expect(subject.from_string(oob_position)).to be_nil
-        end
+      it 'negative file index' do
+        expect(indexes[-1, 0]).to be false
       end
-
-      context 'with correct argument' do
-        it 'returns an instance' do
-          expect(subject.from_string(valid_format)).to be_kind_of subject
-        end
-
-        it 'performs new call' do
-          is_expected.to receive(:new).and_return(instance)
-          expect(subject.from_string(valid_format)).to be_kind_of subject
-        end
+      it 'negative rank index' do
+        expect(indexes[0, -1]).to be false
       end
     end
 
-    describe '.from_indexes' do
-      let(:oob_file_index) { subject.files.size + 1 }
-      let(:oob_rank_index) { subject.ranks.size + 1 }
-
-      context 'with wrong arguments' do
-        it 'out of bounds file index is nil' do
-          expect(subject.from_indexes(oob_file_index, 0)).to be_nil
-        end
-
-        it 'out of bounds rank index is nil' do
-          expect(subject.from_indexes(0, oob_rank_index)).to be_nil
-        end
+    context 'when valid' do
+      it 'upper bound file index' do
+        expect(indexes[files_size - 1, 0]).to be true
+      end
+      it 'upper bound rank index' do
+        expect(indexes[0, ranks_size - 1]).to be true
       end
 
-      context 'with correct arguments' do
-        it 'is not nil' do
-          expect(subject.from_indexes(0, 0)).not_to be_nil
-        end
-
-        it 'performs new call' do
-          is_expected.to receive(:new).and_return(instance)
-          expect(subject.from_indexes(0, 0)).to be_kind_of subject
-        end
+      it 'in bound' do
+        expect(indexes[rand(files_size), rand(ranks_size)]).to be true
+      end
+      it 'zero indexes' do
+        expect(indexes[0, 0]).to be true
       end
     end
+  end
 
-    describe '.valid_position?' do
-      let(:invalid_file) { 'z0' }
-      let(:invalid_rank) { "a#{subject.ranks.size + 1}" }
+  describe '#file' do
+    it { expect(instance.file).to be_kind_of Symbol }
+    it { expect(instance).not_to reassign :file }
+  end
 
-      context 'returns false' do
-        it 'with nil' do
-          expect(subject.valid_position?(nil)).to be false
-        end
+  describe '#rank' do
+    it { expect(instance.rank).to be_kind_of Integer }
+    it { expect(instance).not_to reassign :rank }
+  end
 
-        it 'with invalid file' do
-          expect(subject.valid_position?(invalid_file)).to be false
-        end
+  describe '#file_index' do
+    it 'returns the correct index' do
+      expect(instance.file_index)
+        .to eq described_class.files.index(instance.file)
+    end
+  end
 
-        it 'out of bounds rank' do
-          expect(subject.valid_position?(invalid_rank)).to be false
-        end
+  describe '#rank_index' do
+    it 'returns the correct index' do
+      expect(instance.rank_index)
+        .to eq described_class.ranks.index(instance.rank)
+    end
+  end
 
-        it 'with incorrect type' do
-          expect(subject.valid_position?(99)).to be false
-        end
-
-        it "with decimal as rank" do
-          expect(subject.valid_position?("a1.2")).to be false
-        end
-      end
-
-      context 'returns true' do
-        it 'when in bounds' do
-          expect(subject.valid_position?(valid_format)).to be true
-        end
-
-        it 'case insensitive' do
-          expect(subject.valid_position?(valid_format.upcase)).to be true
-        end
-      end
+  describe '#to_s' do
+    it 'is a string' do
+      expect(instance.to_s).to be_kind_of String
     end
 
-    describe '.valid_indexes?' do
-      context 'wrong argument types' do
-        it 'file to be an integer' do
-          expect { subject.valid_indexes?(3.4, 0) }.to validate_class_as Integer
-        end
-
-        it 'rank to be an integer' do
-          expect { subject.valid_indexes?(0, 1.2) }.to validate_class_as Integer
-        end
-      end
-
-      context 'correct argument types' do
-        let(:file_bound) { subject.files.size }
-        let(:rank_bound) { subject.ranks.size }
-
-        it 'file is out of range' do
-          expect(subject.valid_indexes?(file_bound, 0)).to be false
-        end
-
-        it 'rank is out of range' do
-          expect(subject.valid_indexes?(0, rank_bound)).to be false
-        end
-
-        it 'within bounds' do
-          expect(subject.valid_indexes?(0, 0)).to be true
-        end
-      end
-    end
-
-    describe '#file' do
-      it 'is lowercase' do
-        expect(instance.file).to be :a
-      end
-
-      it 'is a symbol' do
-        expect(instance.file).to be_kind_of Symbol
-      end
-
-      it 'cannot be reassigned' do
-        expect(instance).not_to be_assigning(:file)
-      end
-    end
-
-    describe '#rank' do
-      it 'is an integer' do
-        expect(instance.rank).to be_kind_of Integer
-      end
-
-      it 'cannot be reassigned' do
-        expect(instance).not_to be_assigning(:rank)
-      end
-    end
-
-    describe '#file_index' do
-      it 'indexes files' do
-        is_expected.to receive(:files).and_return(subject.files)
-        expect(instance.file_index).to be 0
-      end
-    end
-
-    describe '#rank_index' do
-      it 'indexes ranks' do
-        is_expected.to receive(:ranks).and_return(subject.ranks)
-        expect(instance.rank_index).to be 0
-      end
-    end
-
-    describe '#to_s' do
-      it 'is a string' do
-        expect(instance.to_s).to be_kind_of String
-      end
-
-      it 'is lowercase' do
-        expect(instance.to_s).to eq(valid_format)
-      end
+    it 'is lowercase' do
+      expect(instance.to_s).to eq valid_format
     end
   end
 end

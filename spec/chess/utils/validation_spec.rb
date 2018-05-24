@@ -1,54 +1,68 @@
 # frozen_string_literal: true
 
 module Chess
-  describe 'Validation Test' do
-    class Dummy
-      extend Chess::Validation
-    end
-    subject(:dummy) { Dummy }
+  class DummyValidation
+    extend Validation
+  end
+end
 
-    describe '.validate_class' do
-      it 'an instance of class' do
-        expect { dummy.validate_class(123, String) }
-          .to raise_error(ArgumentType, /must be a/)
-      end
+RSpec.describe Chess::DummyValidation do
+  subject(:dummy) { described_class }
 
-      it 'returns nil with correct class' do
-        expect(dummy.validate_class(123, Integer)).to be_nil
-      end
+  describe '.validate_class' do
+    it 'raises error when not instance of class' do
+      expect { dummy.validate_class(123, String) }.to ensure_class_as String
     end
 
-    describe '.validate_presence_of' do
-      it 'raises error when falsey' do
-        expect { dummy.validate_presence_of(nil) }
-          .to raise_error(ArgumentType, /not be blank/)
+    it 'returns nil with correct class' do
+      expect(dummy.validate_class(123, Integer)).to be_nil
+    end
+  end
+
+  describe '.validate_presence_of' do
+    context 'when blank argument' do
+      it 'nil raises error ' do
+        expect { dummy.validate_presence_of(nil) }.to ensure_presence
       end
 
-      it 'raises error when empty' do
-        expect { dummy.validate_presence_of('') }
-          .to raise_error(ArgumentType, /not be blank/)
+      it 'empty array raises error ' do
+        expect { dummy.validate_presence_of([]) }.to ensure_presence
       end
 
-      it 'returns nil when not empty or falsy' do
-        expect(dummy.validate_presence_of('string')).to be_nil
+      it 'empty string raises error ' do
+        expect { dummy.validate_presence_of('') }.to ensure_presence
       end
     end
 
-    describe '.validate_included' do
-      let(:list) { %w[1 2 3] }
-      it 'expects types to respond to include' do
-        expect { dummy.validate_included(1, 123) }
-          .to raise_error(NoMethodError, /include?/)
+    context 'when valid argument' do
+      it 'array contains items returns nil' do
+        expect(dummy.validate_presence_of([1])).to be_nil
       end
 
-      it 'raises error when not included' do
-        expect { dummy.validate_included('5', list) }
-          .to raise_error(UnknownType, /not included/)
+      it 'string has value returns nil' do
+        expect(dummy.validate_presence_of('abc')).to be_nil
       end
 
-      it 'returns nil when included' do
-        expect(dummy.validate_included('1', list)).to be_nil
+      it 'zero returns nil' do
+        expect(dummy.validate_presence_of(0)).to be_nil
       end
+    end
+  end
+
+  describe '.validate_included' do
+    let(:list) { %w[1 2 3] }
+
+    it 'expects types to respond to include' do
+      expect { dummy.validate_included(1, 123) }
+        .to raise_error(NoMethodError, /include?/)
+    end
+
+    it 'raises error when not included' do
+      expect { dummy.validate_included(5, list) }.to ensure_included
+    end
+
+    it 'returns nil when included' do
+      expect(dummy.validate_included('1', list)).to be_nil
     end
   end
 end
