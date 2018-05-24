@@ -6,7 +6,7 @@ module Chess
     extend Chess::Validation
 
     FILE_RANGE = 'a'..'h'
-    RANK_RANGE = 1..8
+    RANK_RANGE = '1'..'8'
 
     class << self
       # Creates an instance from string. Example 'a1'
@@ -30,7 +30,7 @@ module Chess
       def valid_position?(file_rank_string)
         return false if file_rank_string.nil? || !file_rank_string.is_a?(String)
         file, rank = split file_rank_string
-        FILE_RANGE.include?(file) && RANK_RANGE.include?(rank.to_i)
+        FILE_RANGE.include?(file) && RANK_RANGE.include?(rank)
       end
 
       # Determines if file and rank indexes are valid
@@ -50,13 +50,14 @@ module Chess
 
       # An array of valid ranks as integers
       def ranks
-        @ranks ||= RANK_RANGE.to_a
+        @ranks ||= RANK_RANGE.map(&:to_i)
       end
 
       private
 
+      # Regex split any non-digit and digit
       def split(file_rank_string)
-        file_rank_string.downcase.scan(/\D+|\d+/)
+        file_rank_string.downcase.scan(/[a-z]+|(?<=[a-z]).*/)
       end
     end
 

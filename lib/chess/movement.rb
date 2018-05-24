@@ -7,7 +7,7 @@ module Chess
     class << self
       def types
         @types ||= methods.grep(/move_as_/) do |func|
-          func.to_s.gsub(/move_as_/, '').to_sym
+          func.to_s.gsub(/move_as_/, '').downcase.to_sym
         end
       end
 

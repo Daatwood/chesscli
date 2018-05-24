@@ -6,7 +6,6 @@ module Chess
     extend Chess::Validation
     class << self
       # Transcend into Space and Memory and fetches all subclasses
-      # TODO combine with types for a single method
       def descendants
         @descendants ||= ObjectSpace.each_object(Class).select do |klass|
           klass < self

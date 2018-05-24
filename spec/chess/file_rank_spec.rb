@@ -126,6 +126,10 @@ module Chess
         it 'with incorrect type' do
           expect(subject.valid_position?(99)).to be false
         end
+
+        it "with decimal as rank" do
+          expect(subject.valid_position?("a1.2")).to be false
+        end
       end
 
       context 'returns true' do
