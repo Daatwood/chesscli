@@ -6,8 +6,15 @@ RSpec.describe Chess::Movement do
   subject { described_class }
 
   let(:file_rank) { Chess::FileRank.from_string('a1') }
-  let(:ray)       { { ray: [[0, 1]] }          }
-  let(:offset)    { { offset: [[1, 1]] }       }
+  let(:ray)       { { ray: [[0, 1]] } }
+  let(:offset)    { { offset: [[1, 1]] } }
+
+  describe '.new' do
+    it 'is private' do
+      expect { described_class.public_send(:new) }
+        .to raise_error(NoMethodError, /private/)
+    end
+  end
 
   describe '.types' do
     subject(:types) { described_class.types }

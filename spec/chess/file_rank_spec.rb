@@ -80,6 +80,10 @@ RSpec.describe Chess::FileRank do
       it 'sets file to lowercase' do
         expect(from_string[valid_format].file).to match(/[a-z]/)
       end
+
+      it 'removes leading and trailing whitespace' do
+        expect(from_string['   a1   '].to_s).to eq 'a1'
+      end
     end
   end
 
@@ -197,7 +201,7 @@ RSpec.describe Chess::FileRank do
         expect(indexes[0, ranks_size - 1]).to be true
       end
 
-      it 'in bound' do
+      it 'inside index bounds' do
         expect(indexes[rand(files_size), rand(ranks_size)]).to be true
       end
       it 'zero indexes' do

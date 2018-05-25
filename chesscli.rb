@@ -27,8 +27,9 @@ end.parse!
 options.each do |option, value|
   abort "Missing required argument #{option.upcase}." if value.nil?
 end
-piece = options.fetch(:piece)
-position = options.fetch(:position)
+
+piece = options.fetch(:piece).strip
+position = options.fetch(:position).strip
 
 unless Chess::Piece.types.include? piece.downcase
   abort "#{piece} is not a valid chess piece."

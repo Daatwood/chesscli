@@ -8,10 +8,20 @@ module Chess
     FILE_RANGE = 'a'..'h'
     RANK_RANGE = '1'..'8'
 
+    # File and Ranks are read-only to prevent setting invalid positions
+    # Could add custom setters for file and rank to validate positions
+    attr_reader :file, :rank
+
+    # Do not use `.new`
+    # Use `.from_string` or `.from_indexes`
+    # This will ensure the position is both a valid file and rank
+    private_class_method :new
+
     class << self
       # Creates an instance from string. Example 'a1'
       def from_string(file_rank_string)
         validate_class file_rank_string, String
+        file_rank_string = file_rank_string.strip.freeze
         validate_presence_of file_rank_string
         return nil unless valid_position?(file_rank_string)
         file, rank = split file_rank_string
@@ -56,15 +66,6 @@ module Chess
         file_rank_string.downcase.scan(/[a-z]+|(?<=[a-z]).*/)
       end
     end
-
-    # Do not use `.new`
-    # Use `.from_string` or `.from_indexes`
-    # This will ensure the position is both a valid file and rank
-    private_class_method :new
-
-    # File and Ranks are read-only to prevent setting invalid positions
-    # Could add custom setters for file and rank to validate positions
-    attr_reader :file, :rank
 
     def initialize(file, rank)
       @file = file

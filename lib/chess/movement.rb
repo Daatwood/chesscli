@@ -4,25 +4,33 @@ module Chess
   # Calculates the possible positions from initial position given movement set
   class Movement
     extend Chess::Validation
+
+    # Do not use `.new`
+    # TODO refactor into a singleton / service class
+    private_class_method :new
+
     class << self
+      # Creates a valid type list of movement actions
       def types
         @types ||= methods.grep(/move_as_/) do |func|
           func.to_s.gsub(/move_as_/, '').downcase.to_sym
         end
       end
 
+      # Offsets a file and rank  with given amount, returning nil if new
+      # position is not valid
       def move_as_offset(file_rank, file_offset, rank_offset)
         FileRank.from_indexes(file_rank.file_index + file_offset,
                               file_rank.rank_index + rank_offset)
       end
 
+      # Continually adds offset to previously calculated file and rank until nil
+      # or is the same as last. Reutrns an array
       def move_as_ray(file_rank, file_offset, rank_offset)
         set = []
-        last_file_rank = nil
         while (file_rank = move_as_offset(file_rank, file_offset, rank_offset))
-          break if last_file_rank == file_rank # Break out, not going anywhere..
+          break if set.last == file_rank # Break out, not going anywhere..
           set << file_rank
-          last_file_rank = file_rank.dup
         end
         set
       end
