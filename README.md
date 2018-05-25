@@ -5,6 +5,9 @@ Determine possible locations of a chess piece can move to on a chessboard, assum
 ## Getting Started
 
 Clone the repository
+```
+$ git clone https://github.com/Daatwood/chesscli.git
+```
 
 ### Prerequisites
 
