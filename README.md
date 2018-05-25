@@ -1,6 +1,6 @@
 # Ruby Chess
 
-Determine possible locations of a chess piece can move to on a chessboard, assuming all positions are available. 
+Determine possible positions a chess piece can move to on a chessboard, assuming all positions are available. 
 
 ## Getting Started
 
