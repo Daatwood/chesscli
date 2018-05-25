@@ -239,4 +239,12 @@ RSpec.describe Chess::FileRank do
       expect(instance.to_s).to eq valid_format
     end
   end
+
+  describe '#==' do
+    let(:other) { described_class.from_string('a1') }
+
+    it 'compares string value' do
+      is_expected.to be == other
+    end
+  end
 end
