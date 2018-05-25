@@ -7,7 +7,7 @@ require_relative 'lib/chess'
 options = { piece: nil, position: nil }
 OptionParser.new do |opts|
   opts.version = '1.0'
-  opts.banner = "Usage: #{__FILE__} [options]"
+  opts.banner = "Usage: ruby #{__FILE__} [options]"
   opts.separator 'Specific options:'
 
   opts.on('-p', '--piece PIECE',
