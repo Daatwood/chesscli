@@ -17,15 +17,11 @@ Developed on Ruby 2.4
 
 ### Run it!
 
-Possible pieces: Queen, Rook, Knight, Bishop, King
-
-_sorry no pawn yet_
-
 ```
 $ ruby chesscli.rb --piece PIECE --position POSITION
 ```
 
-With `--help` option provides this friendly output
+With `--help` option to provide helpful tip below
 
 ```
 Usage: ruby ./chesscli.rb [options]
@@ -37,15 +33,7 @@ Specific options:
 
 ### Example
 
-```
-$ ruby ./chesscli.rb -p knight -l b6
-```
-
-Outputs
-
-```
-a4, c4, d5, d7, a8, c8
-```
+`$ ruby ./chesscli.rb -p knight -l b6` Outputs: `a4, c4, d5, d7, a8, c8`
 
 ## Running Tests
 
