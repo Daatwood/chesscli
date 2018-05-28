@@ -6,7 +6,7 @@ Determine possible positions a chess piece can move to on a chessboard, assuming
 
 Clone the repository
 ```
-$ git clone https://github.com/Daatwood/chesscli.git
+$ git clone https://github.com/Daatwood/chess_cli.git
 ```
 
 ### Prerequisites
@@ -18,7 +18,7 @@ Developed on Ruby 2.4
 ### Run it!
 
 ```
-$ ruby chesscli.rb --piece PIECE --position POSITION
+$ ruby chess_cli.rb --piece PIECE --position POSITION
 ```
 
 With `--help` option to provide helpful tip below
