@@ -24,7 +24,7 @@ $ ruby chesscli.rb --piece PIECE --position POSITION
 With `--help` option to provide helpful tip below
 
 ```
-Usage: ruby ./chesscli.rb [options]
+Usage: ruby ./chess_cli.rb [options]
 Specific options:
     -p, --piece PIECE                Type of chess piece. (rook, queen, knight, king, bishop)
     -l, --position POSITION          Alphanumeric position on the board. Example: d3
@@ -33,7 +33,7 @@ Specific options:
 
 ### Example
 
-`$ ruby ./chesscli.rb -p knight -l b6` Outputs: `a4, c4, d5, d7, a8, c8`
+`$ ruby ./chess_cli.rb -p knight -l b6` Outputs: `a4, c4, d5, d7, a8, c8`
 
 ## Running Tests
 

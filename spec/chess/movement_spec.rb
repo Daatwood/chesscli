@@ -42,7 +42,7 @@ RSpec.describe Chess::Movement do
       expect(in_bound_offset).to be_kind_of Chess::FileRank
     end
 
-    it 'off board location as nil' do
+    it 'off board position as nil' do
       expect(out_bound_offset).to be_nil
     end
   end
